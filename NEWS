@@ -1,5 +1,16 @@
 # Releases
 
+## git2effort 0.1.1 - (2020-05-04)
+
+** New features and improvements: **
+ * Outputting more (and clearer) information
+ * Addied threshold t and period p as input parameters
+ * More details and examples in the README.md
+
+** Bugs fixed: **
+ * --version now returns the current version
+
+
 ## git2effort 0.1 - (2020-05-03)
 
 ** New features and improvements: **

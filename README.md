@@ -5,14 +5,19 @@ Calculate development effort estimation from a Git repository.
 ## Usage
 
 ```
-usage: git2effort [-c <file>] [-g] <git_repository> [<args>] | --help | --version
+usage: git2effort <git_repository> [<args>] | --help | --version
+
+optional arguments:
+  -t THRESHOLD, --threshold THRESHOLD
+                        Threshold value (in commits) to determine if a
+                        developers is full-time devoted to the project.
+                        Default=75.
+  -p PERIOD, --period PERIOD
+                        Length of the time period (in months). Default=6.
 
 optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show version
-  -c FILE, --config FILE
-                        set configuration file
-  -g, --debug           set debug mode on
 
 ```
 
@@ -82,33 +87,52 @@ Robles, G., González-Barahona, J. M., Cervigón, C., Capiluppi, A., & Izquierdo
 ```
 
 
-## Examples
+## Understanding git2effort
 
-### Perceval
+The threshold t determines what developers are considered full-time in a period
+of time p. So, if in p months a developer does t commits, the developer is
+full-time. If not, his/her contributions will be a fraction of that.
 
-To run this backend execute the next command. Take into account that to run
-this backend Git program has to be installed on your system.
-
-```
-$ git2effort git 'https://github.com/chaoss/grimoirelab-perceval.git' --from-date '2016-01-01'
-```
-
-git2effort can also work with a Git log file as input. We recommend to use the next command to get the most complete log file.
-
-```
-git log --raw --numstat --pretty=fuller --decorate=full --parents --reverse --topo-order -M -C -c --remotes=origin --all > /tmp/gitlog.log
-```
-
-Then, to run git2effort on it, just execute any of the next commands:
+The value of the threshold t depends on the project, in particular, on its
+process (e.g., if there is a review process in place, if there is commit
+squashing when merging). Below you can find a list of projects that can serve
+as an example. The t values given below are supported by feedback provided
+by the developers of these projects.
 
 ```
-$ git2effort --git-log '/tmp/gitlog.log' 'file:///myrepo.git'
+Example threshold t values (for a default period of 6 months):
+    12: Strong review process with commit squashing, like in OpenStack and Moodle
+    18: Review process with commit squashing, like in Linux and Webkit
+    30: Soft review process, like in Mediawiki
+    50: Strong pull-request-driven process, like in Ceph
+    75: Soft pull-request-driven process, like in git2effort
+   100: Non-engineered process, like in the rest
+'''
+
+### Example: Running git2effort with Perceval
+
+To estimate the effort for a Git repository, execute the next command. Take into
+account that Git has to be installed on your system.
+
+In the case of Perceval, we assume that it is a project that follows a strong
+pull-request-driven process, like the one in Ceph, so we choose a threshold
+value of 50:
+
+```
+$ git2effort --threshold=50 'https://github.com/chaoss/grimoirelab-perceval.git'
 ```
 
-or
+### Example: Running git2effort with git2effort
+
+To estimate the effort for a Git repository, execute the next command. Take into
+account that Git has to be installed on your system.
+
+In the case of git2effort, we assume that it is a project that follows a soft
+pull-request-driven process, so we choose a threshold value of 75 (as this is 
+the default one in git2effort we do not need to specify it):
 
 ```
-$ git2effort '/tmp/gitlog.log'
+$ git2effort 'https://github.com/chaoss/grimoirelab-perceval.git'
 ```
 
 

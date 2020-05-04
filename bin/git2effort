@@ -26,10 +26,12 @@ import sys
 
 import git2effort
 import git2effort.effort
+import git2effort._version
 
 
 GIT2EFFORT_USAGE_MSG = \
-"""%(prog)s [-g] <git_repository> [<args>] | --help | --version"""
+"""%(prog)s <git_repository> [<args>] | --help | --version"""
+# """%(prog)s [-g] <git_repository> [<args>] | --help | --version"""
 
 GIT2EFFORT_DESC_MSG = \
 """Calculate development effort estimation from a Git repository.
@@ -37,12 +39,15 @@ GIT2EFFORT_DESC_MSG = \
 optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show version
-  -g, --debug           set debug mode on
 """
+#  -g, --debug           set debug mode on
+
+
+GIT2EFFORT_EPILOG_MSG = \
+"""Visit http://github.com/gregoriorobles/git2effort for further information."""
 
 GIT2EFFORT_VERSION_MSG = \
-"""%(prog)s """
-#"""%(prog)s """  + git2effort.__version__
+"""%(prog)s """  + git2effort._version.__version__
 
 
 # Logging formats
@@ -53,11 +58,11 @@ GIT2EFFORT_DEBUG_LOG_FORMAT = "[%(asctime)s - %(name)s - %(levelname)s] - %(mess
 def main():
     args = parse_args()
     
-    configure_logging(args.debug)
+#    configure_logging(args.debug)
 
     logging.info("git2effort starting.")
 
-    git2effort.effort.run(args.git_repository)
+    git2effort.effort.run(vars(args))
 
     logging.info("git2effort finished.")
 
@@ -67,6 +72,7 @@ def parse_args():
 
     parser = argparse.ArgumentParser(usage=GIT2EFFORT_USAGE_MSG,
                                      description=GIT2EFFORT_DESC_MSG,
+                                     epilog=GIT2EFFORT_EPILOG_MSG,
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      add_help=False)
 
@@ -75,12 +81,15 @@ def parse_args():
     parser.add_argument('-v', '--version', action='version',
                         version=GIT2EFFORT_VERSION_MSG,
                         help=argparse.SUPPRESS)
-    parser.add_argument('-g', '--debug', dest='debug',
-                        action='store_true',
-                        help=argparse.SUPPRESS)
-
+#    parser.add_argument('-g', '--debug', dest='debug',
+#                        action='store_true',
+#                        help=argparse.SUPPRESS)
+                        
     parser.add_argument("git_repository", help="URL of the Git repository you want to estimate development effort")
 
+    parser.add_argument('-t', '--threshold', type=int, default=75, help='Threshold value (in commits) to determine if a developers is full-time devoted to the project. Default=75.')
+
+    parser.add_argument('-p', '--period', type=int, default=6, help='Length of the time period  (in months). Default=6.')
 
     if len(sys.argv) == 1:
         parser.print_help()

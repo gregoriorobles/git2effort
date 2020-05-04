@@ -19,6 +19,7 @@
 #     Gregorio Robles <grex@gsyc.urjc.es>
 #
 
+import logging
 from collections import defaultdict, Counter
 from datetime import datetime, timezone
 from perceval.backends.core.git import Git
@@ -27,12 +28,9 @@ from .merging import simplemerge
 
 import sys
 
-
-period_length = 6 # in months. Values can be [1, 2, 3, 4, 6, 12]
-threshold = 50 # in number of commits
-active_days = True
-   
-def author_counting(authorsdict):
+  
+def author_counting(authorsdict, period_length, active_days):
+    logging.info("Applying effort estimation model.")
     author_counters = []
     for author in authorsdict:
         commit_days = []
@@ -46,7 +44,7 @@ def author_counting(authorsdict):
         author_counters.append(Counter(dates))
     return author_counters
 
-def project_period_effort(author_counter):
+def project_period_effort(author_counter, threshold, period_length):
     effort_periods = defaultdict(int) 
     for counter in author_counter:
         for period in counter:
@@ -57,7 +55,7 @@ def project_period_effort(author_counter):
             effort_periods[period] += effort
     return effort_periods
 
-def project_period_maxeffort(author_counter):
+def project_period_maxeffort(author_counter, period_length):
     effort_periods = defaultdict(int) 
     for counter in author_counter:
         for period in counter:
@@ -71,7 +69,12 @@ def project_effort(effort_periods):
     return total_effort
 
 
-def run(repo_url):
+def run(args):
+
+    repo_url = args['git_repository']
+    period_length = args['period']
+    threshold = args['threshold']
+    active_days = True
 
     # directory for letting Perceval clone the git repo
     repo_dir = '/tmp/' + repo_url.split('/')[-1] + '.git'
@@ -88,14 +91,26 @@ def run(repo_url):
             first_commit = commitdate
         authorDict[commit['data']['Author']].append(commitdate)
 
-    print("First commit:", first_commit)
-    print(authorDict.keys())
-    print(simplemerge(authorDict))
-    print(authorDict.keys())
-    author_count = author_counting(authorDict)
-    print(author_count)
-    effort_periods = project_period_effort(author_count)
-    maxeffort_periods = project_period_maxeffort(author_count)
-    print(effort_periods)
-    print(round(project_effort(effort_periods), 2))
-    print(project_effort(maxeffort_periods))
+#    print(authorDict.keys())
+    simplemerge(authorDict)
+#    print(authorDict.keys())
+    author_count = author_counting(authorDict, period_length, active_days)
+#    print(author_count)
+    effort_periods = project_period_effort(author_count, threshold, period_length)
+    maxeffort_periods = project_period_maxeffort(author_count, period_length)
+#    print(effort_periods)
+
+    print()
+    print("CONFIGURATIONS:")
+    print("  Length of period (in months):", period_length)
+    print("  Threshold t (in commits in a period):", threshold)
+    print()
+    print("RESULTS:")
+    print("  First commit date:", first_commit, "--", round((datetime.now(timezone.utc)-first_commit).days/30, 2) , "months ago")
+    print("  Maximum possible development effort (in person-months):", project_effort(maxeffort_periods))
+    print()
+    print("  ---> Estimated development effort (in person-months):", round(project_effort(effort_periods), 2))
+    print()
+    print("For more information, visit http://github.com/gregoriorobles/git2effort")
+    print()
+

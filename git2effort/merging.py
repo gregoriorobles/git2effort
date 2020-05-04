@@ -19,6 +19,9 @@
 #     Gregorio Robles <grex@gsyc.urjc.es>
 #
 
+import logging
+
+
 def same(authors):
     return_list = []
     tmp_list = [] # This list will contain triples of author, name and email
@@ -43,6 +46,7 @@ def same(authors):
     return return_list
 
 def simplemerge(authorsdict):
+    logging.info("Merging authors using diverse authorship information.")
     same_authors = same(authorsdict.keys())
     for match1, match2 in same_authors:
         authorsdict[match1] = authorsdict[match1] + authorsdict[match2]
