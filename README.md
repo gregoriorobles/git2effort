@@ -107,7 +107,7 @@ Example threshold t values (for a default period of 6 months):
     50: Strong pull-request-driven process, like in Ceph
     75: Soft pull-request-driven process, like in git2effort
    100: Non-engineered process, like in the rest
-'''
+```
 
 ### Example: Running git2effort with Perceval
 
