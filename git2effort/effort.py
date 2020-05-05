@@ -32,6 +32,7 @@ import sys
 def author_counting(authorsdict, period_length, active_days):
     logging.info("Applying effort estimation model.")
     author_counters = []
+    commits_same_day = 0
     for author in authorsdict:
         commit_days = []
         dates = []
@@ -41,7 +42,11 @@ def author_counting(authorsdict, period_length, active_days):
                 commit_days.append((date.year, date.month, date.day))
                 period = int(round((date.month-1)/(period_length*2))+1)
                 dates.append(str(date.year) + "." + str(period))
+            else:
+                commits_same_day += 1
         author_counters.append(Counter(dates))
+    if active_days:
+        logging.info("Number of same author commits on the same day: " + str(commits_same_day))
     return author_counters
 
 def project_period_effort(author_counter, threshold, period_length):
@@ -82,18 +87,18 @@ def run(args):
     first_commit = datetime.now(timezone.utc)
     authorDict = defaultdict(list)
 
-    # create a Git object, pointing to repo_url, using repo_dir for cloning
     repo = Git(uri=repo_url, gitpath=repo_dir)
-    # fetch all commits as an iterator, and iterate it
+
     for commit in repo.fetch():
         commitdate = datetime.strptime(commit['data']['AuthorDate'], '%a %b %d %H:%M:%S %Y %z')
         if commitdate < first_commit:
             first_commit = commitdate
         authorDict[commit['data']['Author']].append(commitdate)
+    logging.info("Authors found: " + str(len(authorDict)))
 
-#    print(authorDict.keys())
     simplemerge(authorDict)
-#    print(authorDict.keys())
+    logging.info("Authors after merge: " + str(len(authorDict)))
+    
     author_count = author_counting(authorDict, period_length, active_days)
 #    print(author_count)
     effort_periods = project_period_effort(author_count, threshold, period_length)

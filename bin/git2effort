@@ -30,17 +30,16 @@ import git2effort._version
 
 
 GIT2EFFORT_USAGE_MSG = \
-"""%(prog)s <git_repository> [<args>] | --help | --version"""
-# """%(prog)s [-g] <git_repository> [<args>] | --help | --version"""
+"""%(prog)s [-g] [<args>] <git_repository> | --help | --version"""
 
 GIT2EFFORT_DESC_MSG = \
 """Calculate development effort estimation from a Git repository.
 
 optional arguments:
+  -g, --debug           set debug mode on
   -h, --help            show this help message and exit
   -v, --version         show version
 """
-#  -g, --debug           set debug mode on
 
 
 GIT2EFFORT_EPILOG_MSG = \
@@ -58,7 +57,7 @@ GIT2EFFORT_DEBUG_LOG_FORMAT = "[%(asctime)s - %(name)s - %(levelname)s] - %(mess
 def main():
     args = parse_args()
     
-#    configure_logging(args.debug)
+    configure_logging(args.debug)
 
     logging.info("git2effort starting.")
 
@@ -81,9 +80,9 @@ def parse_args():
     parser.add_argument('-v', '--version', action='version',
                         version=GIT2EFFORT_VERSION_MSG,
                         help=argparse.SUPPRESS)
-#    parser.add_argument('-g', '--debug', dest='debug',
-#                        action='store_true',
-#                        help=argparse.SUPPRESS)
+    parser.add_argument('-g', '--debug', dest='debug',
+                        action='store_true',
+                        help=argparse.SUPPRESS)
                         
     parser.add_argument("git_repository", help="URL of the Git repository you want to estimate development effort")
 

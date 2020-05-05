@@ -5,7 +5,7 @@ Calculate development effort estimation from a Git repository.
 ## Usage
 
 ```
-usage: git2effort <git_repository> [<args>] | --help | --version
+usage: git2effort [-g] [<args>] <git_repository> | --help | --version
 
 optional arguments:
   -t THRESHOLD, --threshold THRESHOLD
@@ -16,6 +16,7 @@ optional arguments:
                         Length of the time period (in months). Default=6.
 
 optional arguments:
+  -g, --debug           set debug mode on
   -h, --help            show this help message and exit
   -v, --version         show version
 
@@ -64,28 +65,6 @@ $ pip3 install -r requirements.txt
 $ pip3 install .
 ```
 
-## References
-
-If you use git2effort in your research papers, please refer to [Estimating development effort in free/open source software projects by mining software repositories: a case study of openstack](https://dl.acm.org/doi/abs/10.1145/2597073.2597107) -- [Pre-print](https://www.researchgate.net/publication/260953482_Estimating_Development_Effort_in_FreeOpen_Source_Software_Projects_by_Mining_Software_Repositories):
-
-### APA style
-
-```
-Robles, G., González-Barahona, J. M., Cervigón, C., Capiluppi, A., & Izquierdo-Cortázar, D. (2014, May). Estimating development effort in free/open source software projects by mining software repositories: a case study of openstack. In Proceedings of the 11th Working Conference on Mining Software Repositories (pp. 222-231).
-```
-
-### BibTeX
-
-```
-@inproceedings{robles2014estimating,
-  title={Estimating development effort in free/open source software projects by mining software repositories: a case study of openstack},
-  author={Robles, Gregorio and Gonz{\'a}lez-Barahona, Jes{\'u}s M and Cervig{\'o}n, Carlos and Capiluppi, Andrea and Izquierdo-Cort{\'a}zar, Daniel},
-  booktitle={Proceedings of the 11th Working Conference on Mining Software Repositories},
-  pages={222--231},
-  year={2014}
-}
-```
-
 
 ## Understanding git2effort
 
@@ -106,10 +85,10 @@ Example threshold t values (for a default period of 6 months):
     30: Soft review process, like in Mediawiki
     50: Strong pull-request-driven process, like in Ceph
     75: Soft pull-request-driven process, like in git2effort
-   100: Non-engineered process, like in the rest
+   100: Non-engineered process
 ```
 
-### Example: Running git2effort with Perceval
+### Example: Running git2effort on Perceval
 
 To estimate the effort for a Git repository, execute the next command. Take into
 account that Git has to be installed on your system.
@@ -119,10 +98,10 @@ pull-request-driven process, like the one in Ceph, so we choose a threshold
 value of 50:
 
 ```
-$ git2effort --threshold=50 'https://github.com/chaoss/grimoirelab-perceval.git'
+$ git2effort --threshold=50 https://github.com/chaoss/grimoirelab-perceval.git
 ```
 
-### Example: Running git2effort with git2effort
+### Example: Running git2effort on git2effort
 
 To estimate the effort for a Git repository, execute the next command. Take into
 account that Git has to be installed on your system.
@@ -132,7 +111,31 @@ pull-request-driven process, so we choose a threshold value of 75 (as this is
 the default one in git2effort we do not need to specify it):
 
 ```
-$ git2effort 'https://github.com/chaoss/grimoirelab-perceval.git'
+$ git2effort https://github.com/gregoriorobles/git2effort
+```
+
+
+
+## References
+
+If you use git2effort in your research papers, please refer to [Estimating development effort in free/open source software projects by mining software repositories: a case study of openstack](https://dl.acm.org/doi/abs/10.1145/2597073.2597107) -- [Pre-print](https://www.researchgate.net/publication/260953482_Estimating_Development_Effort_in_FreeOpen_Source_Software_Projects_by_Mining_Software_Repositories):
+
+### APA style
+
+```
+Robles, G., González-Barahona, J. M., Cervigón, C., Capiluppi, A., & Izquierdo-Cortázar, D. (2014, May). Estimating development effort in free/open source software projects by mining software repositories: a case study of openstack. In Proceedings of the 11th Working Conference on Mining Software Repositories (pp. 222-231).
+```
+
+### BibTeX
+
+```
+@inproceedings{robles2014estimating,
+  title={Estimating development effort in free/open source software projects by mining software repositories: a case study of openstack},
+  author={Robles, Gregorio and Gonz{\'a}lez-Barahona, Jes{\'u}s M and Cervig{\'o}n, Carlos and Capiluppi, Andrea and Izquierdo-Cort{\'a}zar, Daniel},
+  booktitle={Proceedings of the 11th Working Conference on Mining Software Repositories},
+  pages={222--231},
+  year={2014}
+}
 ```
 
 
