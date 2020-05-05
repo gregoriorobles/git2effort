@@ -31,6 +31,7 @@ optional arguments:
 * python3-bs4 (beautifulsoup4) >= 4.3
 * python3-feedparser >= 5.1.3
 * python3-dulwich >= 0.18.5
+* tabulate >= 0.8.7
 * grimoirelab-toolkit >= 0.1.4
 
 Note that you should have also the following packages installed in your system:
@@ -114,6 +115,9 @@ the default one in git2effort we do not need to specify it):
 $ git2effort https://github.com/gregoriorobles/git2effort
 ```
 
+## Research in Progress
+
+This is research in progress. If you have any comments or suggestions, please contact me (grex at gsyc.urjc.es). I will be more than happy to hear to your feedback.
 
 
 ## References

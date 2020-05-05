@@ -1,5 +1,13 @@
 # Releases
 
+## git2effort 0.1.2 - (2020-05-06)
+
+** New features and improvements: **
+ * Added the possibility to have debug information
+ * Documented and added logging and debugging info
+ * Results per period shown in a tabular form
+
+
 ## git2effort 0.1.1 - (2020-05-04)
 
 ** New features and improvements: **

@@ -20,6 +20,8 @@
 #
 
 import logging
+import tabulate
+
 from collections import defaultdict, Counter
 from datetime import datetime, timezone
 from perceval.backends.core.git import Git
@@ -28,8 +30,18 @@ from .merging import simplemerge
 
 import sys
 
-  
+
 def author_counting(authorsdict, period_length, active_days):
+    """Given an authordict, and the specified period_length, returns a list with the number commits in each period.
+    
+    :param authorsdict: dictionary of authors (key: (name, email); value: list of commit dates)
+    
+    :param period_length: Length of the time period (in months)
+    
+    :param active_days: Boolean value that determines if we count commits on a same day just once
+    
+    :returns: list of Counter collections, which counts commits grouped by periods.
+    """
     logging.info("Applying effort estimation model.")
     author_counters = []
     commits_same_day = 0
@@ -50,38 +62,83 @@ def author_counting(authorsdict, period_length, active_days):
     return author_counters
 
 def project_period_effort(author_counter, threshold, period_length):
+    """Given an author counter object (a list of Counters with the commits by periods) and the threshold, returns a dictionary with the total effort (value) for each period (key).
+   
+    :param author_counter: list of Counter collections, which counts commits grouped by periods.
+    
+    :param threshold: Threshold value (in commits) to determine if a developers is full-time devoted to the project.
+    
+    :param period_length: Length of the time period (in months)
+    
+    :returns: a tuple with:
+       a dictionary with the total effort (value) for each period (key)
+       a dictionary with the number of full_time developers (value) for each period (key)
+       a dictionary with the number of non_full_time developers (value) for each period (key)
+    """
     effort_periods = defaultdict(int) 
+    full_time_periods = defaultdict(int)
+    non_full_time_periods = defaultdict(int)
     for counter in author_counter:
         for period in counter:
             effort = round(counter[period]/threshold * period_length, 2)
             if effort > period_length:   # saturation
                 effort = period_length
+                full_time_periods[period] += 1
+            else:
+                non_full_time_periods[period] += 1
 #            print(period, counter[period], effort)
             effort_periods[period] += effort
-    return effort_periods
+    return (effort_periods, full_time_periods, non_full_time_periods)
 
 def project_period_maxeffort(author_counter, period_length):
+    """Given an author counter object (a list of Counters with the commits by periods), returns a dictionary with the maximum possible effort (value) for each period (key).
+    
+    :param author_counter: list of Counter collections, which counts commits grouped by periods.
+    
+    :param period_length: Length of the time period (in months)
+    
+    :returns: dictionary with the maximum possible effort (value) for each period (key).
+    """
     effort_periods = defaultdict(int) 
     for counter in author_counter:
         for period in counter:
             effort_periods[period] += period_length
     return effort_periods
 
-def project_effort(effort_periods):
-    total_effort = 0
-    for period in effort_periods:
-        total_effort += effort_periods[period]
-    return total_effort
+def pretty_print_period(period_length, first_commit, headers, *argv):
+    """Given a dictionary with values for periods (key), the first commit and the period length, returns a line to be printed. A preprended line with the header (the periods) can be added, if desired.
+    
+    :param period_length: Length of the time period (in months)
 
+    :param first_commit: datetime object of first commit
+
+    :param headers: TODO
+
+    :param *argv: TODO
+            
+    :returns: string
+    """
+    period_lists = []
+    for year in range(first_commit.year, datetime.now().year+1):
+        for period in range(int(12/period_length)):
+            period = str(year) + "." + str(period+1)
+            sublist = [period]
+            for d in argv:
+                sublist += [d[period]]
+            period_lists.append(sublist)
+    # TODO: remove the previous periods to first commit and the last periods in the future    
+    return tabulate.tabulate(period_lists, headers=["Period"] + headers)
 
 def run(args):
-
+    """
+    """  
     repo_url = args['git_repository']
     period_length = args['period']
     threshold = args['threshold']
     active_days = True
 
     # directory for letting Perceval clone the git repo
+    # TODO: this is Linux-operating system specific. Should change
     repo_dir = '/tmp/' + repo_url.split('/')[-1] + '.git'
 
     first_commit = datetime.now(timezone.utc)
@@ -101,10 +158,10 @@ def run(args):
     
     author_count = author_counting(authorDict, period_length, active_days)
 #    print(author_count)
-    effort_periods = project_period_effort(author_count, threshold, period_length)
+    (effort_periods, full_time_periods, non_full_time_periods) = project_period_effort(author_count, threshold, period_length)
     maxeffort_periods = project_period_maxeffort(author_count, period_length)
-#    print(effort_periods)
 
+    # Printing results
     print()
     print("CONFIGURATIONS:")
     print("  Length of period (in months):", period_length)
@@ -112,9 +169,12 @@ def run(args):
     print()
     print("RESULTS:")
     print("  First commit date:", first_commit, "--", round((datetime.now(timezone.utc)-first_commit).days/30, 2) , "months ago")
-    print("  Maximum possible development effort (in person-months):", project_effort(maxeffort_periods))
+    print("  Maximum possible development effort (in person-months):", sum(maxeffort_periods.values()))
     print()
-    print("  ---> Estimated development effort (in person-months):", round(project_effort(effort_periods), 2))
+    print(pretty_print_period(period_length, first_commit, ["FT", "Non-FT", "Effort"], full_time_periods, non_full_time_periods, effort_periods))
+    print(" " * 8, "FT: Full-time developers")
+    print()
+    print("  ---> Estimated development effort (in person-months):", round(sum(effort_periods.values()), 2))
     print()
     print("For more information, visit http://github.com/gregoriorobles/git2effort")
     print()
