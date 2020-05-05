@@ -74,7 +74,8 @@ setup(name="git2effort",
           'beautifulsoup4>=4.3.2',
           'feedparser>=5.1.3',
           'dulwich>=0.18.5, <0.19',
-          'urllib3>=1.22'
+          'urllib3>=1.22',
+          'tabulate>=0.8.7'
       ],
       scripts=[
           'bin/git2effort'
