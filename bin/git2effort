@@ -59,6 +59,10 @@ def main():
     
     configure_logging(args.debug)
 
+    if args.period > 12:
+        logging.error("Period cannot be greater than 12.")
+        return
+
     logging.info("git2effort starting.")
 
     git2effort.effort.run(vars(args))
