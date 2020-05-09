@@ -26,13 +26,7 @@ optional arguments:
 
 * Python >= 3.4
 * perceval >= 0.12
-* python3-dateutil >= 2.6
-* python3-requests >= 2.7
-* python3-bs4 (beautifulsoup4) >= 4.3
-* python3-feedparser >= 5.1.3
-* python3-dulwich >= 0.18.5
 * tabulate >= 0.8.7
-* grimoirelab-toolkit >= 0.1.4
 
 Note that you should have also the following packages installed in your system:
 - git
@@ -77,7 +71,7 @@ The value of the threshold t depends on the project, in particular, on its
 process (e.g., if there is a review process in place, if there is commit
 squashing when merging). Below you can find a list of projects that can serve
 as an example. The t values given below are supported by feedback provided
-by the developers of these projects.
+by the developers of these projects. In all cases, the period is 6 months (the default one for git2effort).
 
 ```
 Example threshold t values (for a default period of 6 months):
